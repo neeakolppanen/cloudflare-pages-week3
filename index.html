@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pilvipalvelut-kurssi viikon 3. tehtävä </title>
+    <title>Firebase – Viikko 4</title>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -22,34 +23,128 @@
         }
 
         h1 {
-            color: #f38020;
+            color: #ff9800;
         }
 
-        h2 {
-            color: #333;
+        input {
+            width: 70%;
+            padding: 12px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 12px 20px;
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #e68900;
+        }
+
+        li {
+            margin: 10px 0;
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <h1>Pilvipalvelut viikko 3</h1>
 
-        <h2>Cloudflare Pages -verkkosivu </h2>
+<div class="container">
 
-        <p>
-            Tämä on staattinen verkkosivu, jonka tein pilvipalvelut-kurssin tehtävää varten.
-        </p>
+    <h1>Firebase – Viikko 4</h1>
 
-        <p>
-            Verkkosivun julkaisen  Cloudflare Pagesin avulla ja lähdekoodin tallennan Githubiin.
-        </p>
+    <p>
+        Tämä sivu käyttää Firebase Realtime Databasea
+        tietojen hakemiseen sekä tallentamiseemn.
+    </p>
 
-        <h2>Infrastructure as a Service</h2>
+    <input id="messageInput" type="text" placeholder="Kirjoita viesti">
 
-        <p>
-            Organisaatiot voivat pilvi-infrastruktuurin avulla käyttää tallennus-, laskenta-, ja verkkopalveluita ilman, että niiden tarvitsee itse ylläpitää fyysistä laitteistoa.
-        </p>
-    </div>
+    <button onclick="saveMessage()">Tallenna</button>
+
+    <h2>Tallennetut viestit</h2>
+
+    <ul id="messageList"></ul>
+
+</div>
+
+<script type="module">
+
+    import { initializeApp } from
+    "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+    import {
+        getDatabase,
+        ref,
+        push,
+        onValue
+    } from
+    "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+
+    const firebaseConfig = {
+  apiKey: "AIzaSyBFkKWV7rw_WlXjID4JOcuommqIK8AHrJI",
+  authDomain: "week4-firebase-6714f.firebaseapp.com",
+  databaseURL: "https://week4-firebase-6714f-default-rtdb.firebaseio.com",
+  projectId: "week4-firebase-6714f",
+  storageBucket: "week4-firebase-6714f.firebasestorage.app",
+  messagingSenderId: "175577793195",
+  appId: "1:175577793195:web:5151481a064ecac722adee",
+  measurementId: "G-W74JCY2K3B"
+};
+
+
+
+    const app = initializeApp(firebaseConfig);
+
+    const database = getDatabase(app);
+
+    const messagesRef = ref(database, "messages");
+
+
+    window.saveMessage = function() {
+
+        const input = document.getElementById("messageInput");
+
+        const message = input.value.trim();
+
+        if (message === "") {
+            return;
+        }
+
+        push(messagesRef, {
+            text: message,
+            time: new Date().toISOString()
+        });
+
+        input.value = "";
+    };
+
+
+    onValue(messagesRef, (snapshot) => {
+
+        const list = document.getElementById("messageList");
+
+        list.innerHTML = "";
+
+        snapshot.forEach((child) => {
+
+            const data = child.val();
+
+            const li = document.createElement("li");
+
+            li.textContent = data.text;
+
+            list.appendChild(li);
+
+        });
+
+    });
+
+</script>
+
 </body>
 </html>
